@@ -13,8 +13,8 @@
 
 \# git clone https://github.com/web36m/VHC.git
 
-\# sudo cp ./VHC/vhc /usr/bin/
+\# sudo cp ./VHC/vhc /usr/local/bin/
 
 \# rm -r ./VHC
 
-\# chmod +x /usr/bin/vhc
+\# chmod +x /usr/local/bin/vhc
