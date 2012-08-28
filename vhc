@@ -1,0 +1,63 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          vhc
+# Short-Description: Create a project ready to work
+# Description:       Creating the necessary directories.
+#		     Create a virtual host.
+### END INIT INFO
+
+# Author: Shilov Vasilly <web36m@yandex.ru>
+
+USER=web36m # owner
+mkdir /home/www/$1 # host directory
+mkdir /home/www/$1/public # directory with the working version
+mkdir /home/www/$1/logs # directory for logs
+mkdir /home/www/$1/nbp # netbeans project
+mkdir /home/www/$1/sources # project directory
+mkdir /home/www/$1/tmp # temp directory
+chmod -R 0755 '/home/www/'$1 # set access rights
+chown -R $USER '/home/www/'$1 # set owner
+echo > /home/www/$1/sources/nginx.conf 'server {
+	listen  80;
+	charset utf-8;
+	server_name '$1' www.'$1';
+	root   /home/www/'$1'/public;
+	index  index.php index.html index.htm;
+	access_log /home/www/'$1'/logs/access.log;
+	error_log /home/www/'$1'/logs/error.log;
+
+	location / {
+		root /home/www/'$1'/public;
+		index index.php index.html index.htm;
+		rewrite ^(.*)$ /index.php last;
+	}
+
+        location ~* \.php$ {
+            fastcgi_pass        unix:/tmp/phpfpm.sock;
+            fastcgi_index       index.php;
+            fastcgi_param       SCRIPT_FILENAME  /home/www/'$1'/public$fastcgi_script_name;
+            include             fastcgi_params;
+        }
+
+#	location / {
+#		proxy_pass http://127.0.0.1:8000;
+#		proxy_set_header Host $host;
+#	}
+
+	location ~* ^/(img|js|css)/ {
+		root /home/www/'$1'/public;
+	}
+
+	location = /favicon.ico {
+		log_not_found off;
+		access_log off;
+	}
+
+	location ~ /\.ht {
+		deny  all;
+	}
+}' # create vhost
+ln -s '/home/www/'$1'/sources/nginx.conf' '/etc/nginx/sites-enabled/'$1 # enable vhost
+echo >>/etc/hosts '127.0.0.1    '$1 # add to /etc/hosts
+echo >>/etc/hosts '127.0.0.1    www.'$1 # add to /etc/hosts
+/etc/init.d/nginx restart # restart nginx
