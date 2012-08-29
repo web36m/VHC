@@ -18,3 +18,5 @@
 \# rm -r ./VHC
 
 \# chmod +x /usr/local/bin/vhc
+
+В Netbeans : "Открыть проект" выбираем в нашей nbp и работаем
